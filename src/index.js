@@ -1,11 +1,14 @@
+import './index.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {createStore} from 'redux';
-import './index.css';
-import App from './components/App';
 import registerServiceWorker from './registerServiceWorker';
 import allReducers from './reducers'
+
+import {IntlProvider} from 'react-intl';
+import enMessages from '@boundlessgeo/sdk/locale/en';
+import BasicApp from './components/basic-app/basic-app.jsx'
 
 const store = createStore(
     allReducers
@@ -13,8 +16,10 @@ const store = createStore(
 
 ReactDOM.render(
     <Provider store={store}>
-        <App />
+		<IntlProvider locale='en' messages={enMessages}>
+			<BasicApp />
+		</IntlProvider>
     </Provider>,
-    document.getElementById('root')
+    document.getElementById('main')
 );
 registerServiceWorker();
