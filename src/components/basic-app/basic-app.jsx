@@ -61,7 +61,7 @@ class BasicApp extends React.Component {
   render() {
     return (
       <div id='content'>
-        <Header showLeftIcon={false} title='Boundless SDK Basic Application'>
+        <Header showLeftIcon={false} title='DOLI Framework based on Boundless SDk, React and Redux'>
           <MapConfig map={map}/>
           <Button toggleGroup='navigation' buttonType='Icon' iconClassName='headerIcons ms ms-table' tooltip='Table' onTouchTap={this._toggleTable.bind(this)}/>
           <Button toggleGroup='navigation' buttonType='Icon' iconClassName='headerIcons fa fa-filter' tooltip='Query' onTouchTap={this._toggleQuery.bind(this)}/>
