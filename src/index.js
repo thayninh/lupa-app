@@ -1,14 +1,20 @@
 import './index.css';
+import BasicApp from './components/basic-app/basic-app.jsx'
 import React from 'react';
 import ReactDOM from 'react-dom';
+import registerServiceWorker from './registerServiceWorker';
+
 import {Provider} from 'react-redux';
 import {createStore} from 'redux';
-import registerServiceWorker from './registerServiceWorker';
 import allReducers from './reducers'
 
+//For internationalization, the most important is locale='en' and messages={enMessages}, enMessages is an object for internationalization
 import {IntlProvider} from 'react-intl';
-import enMessages from '@boundlessgeo/sdk/locale/en';
-import BasicApp from './components/basic-app/basic-app.jsx'
+import {addLocaleData} from 'react-intl';
+import viMessages from './resources/locale-data/vi'
+import vi from 'react-intl/locale-data/vi';
+addLocaleData(vi);
+
 
 const store = createStore(
     allReducers
@@ -16,7 +22,7 @@ const store = createStore(
 
 ReactDOM.render(
     <Provider store={store}>
-		<IntlProvider locale='en' messages={enMessages}>
+		<IntlProvider locale='vi' messages={viMessages}>
 			<BasicApp />
 		</IntlProvider>
     </Provider>,

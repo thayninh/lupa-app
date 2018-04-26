@@ -1,3 +1,4 @@
+import './basic-app.css'
 import React from 'react';
 import ReactDOM from 'react-dom'
 import {addLocaleData} from 'react-intl';
@@ -18,15 +19,12 @@ import DrawFeature from '@boundlessgeo/sdk/components/DrawFeature';
 import Zoom from '@boundlessgeo/sdk/components/Zoom';
 import InfoPopup from '@boundlessgeo/sdk/components/InfoPopup';
 import EditPopup from '@boundlessgeo/sdk/components/EditPopup';
-import enLocaleData from 'react-intl/locale-data/en';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+
 
 import '../../../node_modules/@boundlessgeo/sdk/dist/css/components.css'
 import {map, charts} from './basic-app-var'
 
-addLocaleData(
-  enLocaleData
-);
 
 // Needed for onTouchTap
 // Can go away when react 1.0 release
@@ -61,7 +59,7 @@ class BasicApp extends React.Component {
   render() {
     return (
       <div id='content'>
-        <Header showLeftIcon={false} title='DOLI Framework based on Boundless SDk, React and Redux'>
+        <Header showLeftIcon={false} title='HỆ THỐNG HỖ TRỢ RA QUYẾT ĐỊNH QUY HOẠCH SỬ DỤNG ĐẤT'>
           <MapConfig map={map}/>
           <Button toggleGroup='navigation' buttonType='Icon' iconClassName='headerIcons ms ms-table' tooltip='Table' onTouchTap={this._toggleTable.bind(this)}/>
           <Button toggleGroup='navigation' buttonType='Icon' iconClassName='headerIcons fa fa-filter' tooltip='Query' onTouchTap={this._toggleQuery.bind(this)}/>
