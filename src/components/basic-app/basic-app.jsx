@@ -1,7 +1,10 @@
 import './basic-app.css'
+// import 'jquery-ui/themes/base/resizable.css'
+import $ from 'jquery'
+import 'jquery-ui/ui/widgets/draggable'
+// import 'jquery-ui/ui/widgets/resizable'
 import React from 'react';
 import ReactDOM from 'react-dom'
-import {addLocaleData} from 'react-intl';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MapPanel from '@boundlessgeo/sdk/components/MapPanel';
 import LayerList from '@boundlessgeo/sdk/components/LayerList';
@@ -26,18 +29,23 @@ import '../../../node_modules/@boundlessgeo/sdk/dist/css/components.css'
 import {map, charts} from './basic-app-var'
 
 
-// Needed for onTouchTap
-// Can go away when react 1.0 release
-// Check this repo:
-// https://github.com/zilverline/react-tap-event-plugin
+// Needed for onTouchTap. Can go away when react 1.0 release (in the future, try to replace onTouchTap by onClick)
+// Check this repo: https://github.com/zilverline/react-tap-event-plugin
 injectTapEventPlugin();
 
 class BasicApp extends React.Component {
+  //Refer to link: https://medium.com/differential/react-context-and-component-coupling-86e535e2d599 for more information
+  //on how the child components receive objects from parent components
   getChildContext() {
     return {
-      muiTheme: getMuiTheme()
+      muiTheme: getMuiTheme() //Refer to this link: http://www.material-ui.com/#/customization/themes to understand muiTheme
     };
   }
+  static childContextTypes = {
+    muiTheme: React.PropTypes.object
+  };
+
+  //For toggle element
   _toggle(el) {
     if (el.style.display === 'block') {
       el.style.display = 'none';
@@ -56,35 +64,36 @@ class BasicApp extends React.Component {
     this._toggle(ReactDOM.findDOMNode(this.refs.chartPanel));
   }
 
+
   render() {
+    //Make draggable
+    $(function() {
+      $( "#QP_draggable" ).draggable();
+      $( "#table-panel" ).draggable();
+      $( "#Chart_draggable" ).draggable();
+    } );
+    
     return (
       <div id='content'>
         <Header showLeftIcon={false} title='HỆ THỐNG HỖ TRỢ RA QUYẾT ĐỊNH QUY HOẠCH SỬ DỤNG ĐẤT'>
-          <MapConfig map={map}/>
-          <Button toggleGroup='navigation' buttonType='Icon' iconClassName='headerIcons ms ms-table' tooltip='Table' onTouchTap={this._toggleTable.bind(this)}/>
-          <Button toggleGroup='navigation' buttonType='Icon' iconClassName='headerIcons fa fa-filter' tooltip='Query' onTouchTap={this._toggleQuery.bind(this)}/>
-          <Button toggleGroup='navigation' buttonType='Icon' iconClassName='headerIcons ms ms-bar-chart' tooltip='Chart' onTouchTap={this._toggleChart.bind(this)}/>
+          <Button toggleGroup='navigation' buttonType='Icon' iconClassName='headerIcons ms ms-table' tooltip='Bảng Thuộc Tính' onTouchTap={this._toggleTable.bind(this)}/>
+          <Button toggleGroup='navigation' buttonType='Icon' iconClassName='headerIcons fa fa-filter' tooltip='Truy vấn' onTouchTap={this._toggleQuery.bind(this)}/>
           <DrawFeature toggleGroup='navigation' map={map} />
           <Select toggleGroup='navigation' map={map}/>
           <Navigation secondary={true} toggleGroup='navigation' map={map}/>
           <Geocoding />
         </Header>
         <MapPanel id='map' map={map}/>
-        <div ref='queryPanel' className='query-panel'><QueryBuilder map={map} /></div>
+        <div ref='queryPanel' className='query-panel' id="QP_draggable"><QueryBuilder map={map} /></div>
         <div id='geocoding-results' className='geocoding-results-panel'><GeocodingResults map={map} /></div>
         <div id='zoom-buttons'><Zoom map={map} /></div>
         <div id='layerlist'><LayerList allowFiltering={true} showOpacity={true} showDownload={true} showGroupContent={true} showZoomTo={true} allowReordering={true} map={map} /></div>
         <div ref='tablePanel' id='table-panel' className='attributes-table'><FeatureTable toggleGroup='navigation' ref='table' map={map} /></div>
         <div id='editpopup' className='ol-popup'><EditPopup toggleGroup='navigation' map={map} /></div>
         <div id='popup' className='ol-popup'><InfoPopup toggleGroup='navigation' map={map} /></div>
-        <div ref='chartPanel' className='chart-panel'><Chart charts={charts} onClose={this._toggleChart.bind(this)}/></div>
       </div>
     );
   }
 }
-
-BasicApp.childContextTypes = {
-  muiTheme: React.PropTypes.object
-};
 
 export default BasicApp

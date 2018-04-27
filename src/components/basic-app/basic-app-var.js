@@ -86,6 +86,7 @@ var stylePopp = function(feature) {
     return baseStylePopp;
   }
 };
+
 var map = new ol.Map({
   controls: [],
   layers: [
@@ -159,22 +160,6 @@ var map = new ol.Map({
   })
 });
 
-var charts = [{
-  title: 'Airports count per use category',
-  categoryField: 'USE',
-  layer: 'lyr03',
-  valueFields: [],
-  displayMode: 2,
-  operation: 2
-}, {
-  title: 'Forest area total surface',
-  categoryField: 'VEGDESC',
-  layer: 'lyr01',
-  valueFields: ['AREA_KM2'],
-  displayMode: 1,
-  operation: 2
-}];
 export {
-  map,
-  charts
+  map
 }
