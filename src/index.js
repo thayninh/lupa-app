@@ -1,5 +1,5 @@
 import './index.css';
-import BasicApp from './components/basic-app/basic-app.jsx'
+import BasicApp from './components/basic-app/basic-app.js'
 import React from 'react';
 import ReactDOM from 'react-dom';
 import registerServiceWorker from './registerServiceWorker';
