@@ -7,14 +7,16 @@
     "express": "^4.16.3",
     "jquery": "^3.3.1",
     "jquery-ui": "^1.12.1",
-    "material-ui": "^1.0.0-beta.43",
+    "material-ui": "^0.20.0",
     "openlayers": "^4.6.5",
+    "prop-types": "^15.6.1",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-intl": "^2.4.0",
     "react-redux": "^5.0.7",
     "react-scripts": "^1.1.4",
-    "redux": "^4.0.0"
+    "redux": "^4.0.0",
+    "typeface-roboto": "0.0.54"
   },
   "scripts": {
     "start": "react-scripts start",
