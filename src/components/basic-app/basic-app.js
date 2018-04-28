@@ -4,6 +4,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import PropTypes from 'prop-types';
 import ZoomButton from '../zoom-button/zoom-button';
 import MapPanel from '../map-panel/map-panel'
+import LayerButton from '../layer-button/layer-button'
 import ol from 'openlayers';
 
 //----------------------------------------------------------------------------------------------------
@@ -43,6 +44,7 @@ class BasicApp extends React.Component {
 				<HeaderPanel />
 				<MapPanel map={map} />
 				<ZoomButton map={map} />
+				<LayerButton />
 			</div>
 		);
 	}

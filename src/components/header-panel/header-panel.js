@@ -5,8 +5,6 @@ import AppBar from 'material-ui/AppBar';
 class HeaderPanel extends React.Component {
 
 	render() {
-
-		// var tooltip = <FormattedMessage id="greeting" description="" defaultMessage="" />
 		const styles = {
 			appHeight: {
 				height: 50
@@ -19,9 +17,7 @@ class HeaderPanel extends React.Component {
 
 		const rightButtons = (
 			<div>
-				{/* <IconButton tooltip={tooltip}>
-					<ActionHome />
-				</IconButton> */}
+				{this.props.children}
 			</div>
 		);
 
