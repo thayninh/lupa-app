@@ -6,24 +6,50 @@ import ZoomButton from '../zoom-button/zoom-button';
 import MapPanel from '../map-panel/map-panel'
 import LayerButton from '../layer-button/layer-button'
 import ol from 'openlayers';
+import 'openlayers/css/ol.css'
 
 //----------------------------------------------------------------------------------------------------
+//Declare Map object
 var map = new ol.Map({
 	layers: [
-		new ol.layer.Tile({
-			source: new ol.source.OSM()
-		})
+		new ol.layer.Group({
+			type: 'base-group',
+			title: 'Base maps',
+			layers: [
+				new ol.layer.Tile({
+					type: 'base',
+					title: 'Streets',
+					source: new ol.source.OSM(),
+					visible: true,
+				}),
+				new ol.layer.Tile({
+					type: 'base',
+					title: 'Aerial',
+					visible: false,
+					source: new ol.source.XYZ({
+						attributions: [
+							new ol.Attribution({
+								html: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+							})
+						],
+						url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+					})
+				})
+			]
+		}),
+
 	],
-	controls: ol.control.defaults({
-		attributionOptions: {
-			collapsible: false
-		}
-	}),
+	controls: [],
 	view: new ol.View({
-		center: [0, 0],
-		zoom: 2
+		center: [11848350.880429, 1800909.818436], //OSM use EPGS:3857 - WGS 84 / Pseudo-Mercator - Spherical Mercator, Google Maps, OpenStreetMap, Bing, ArcGIS, ESRI
+		zoom: 6
 	})
 });
+
+//Add scale line
+var scaleLineControl = new ol.control.ScaleLine({});
+scaleLineControl.setUnits("metric");
+map.addControl(scaleLineControl);
 
 //---------------------------------------------------------------------------------------------------------
 
@@ -39,9 +65,11 @@ class BasicApp extends React.Component {
 	}
 
 	render() {
+		
+		  
 		return (
 			<div id='content'>
-				<HeaderPanel />
+				<HeaderPanel/>
 				<MapPanel map={map} />
 				<ZoomButton map={map} />
 				<LayerButton />

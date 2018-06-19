@@ -1,8 +1,8 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import IconButton from 'material-ui/IconButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
-import ContentRemove from 'material-ui/svg-icons/content/remove';
+import ZoomIn from 'material-ui/svg-icons/action/zoom-in';
+import ZoomOut from 'material-ui/svg-icons/action/zoom-out';
 import './zoom-button.css'
 
 class ZoomButton extends React.Component {
@@ -26,8 +26,8 @@ class ZoomButton extends React.Component {
 
 	render() {
 		//console.log(this.props.map)
-		var tooltip_zoom_in = <FormattedMessage id="zoom-button.zoom-in" defaultMessage="Zoom in" />
-		var tooltip_zoom_out = <FormattedMessage id="zoom-button.zoom-out" defaultMessage="Zoom out" />
+		var tooltipZoomIn = <FormattedMessage id="zoom-button.zoom-in" defaultMessage="Zoom in" />
+		var tooltipZoomOut = <FormattedMessage id="zoom-button.zoom-out" defaultMessage="Zoom out" />
 		const styles = {
 			smallIcon: {
 				width: 25,
@@ -45,20 +45,20 @@ class ZoomButton extends React.Component {
 		return (
 			<div>
 				<div id="zoom-in-icon" onClick={this.zoom_in_click}>
-					<IconButton tooltip={tooltip_zoom_in}
+					<IconButton tooltip={tooltipZoomIn}
 						iconStyle={styles.smallIcon}
 						style={styles.small}
 						tooltipPosition="top-center">
-						<ContentAdd />
+						<ZoomIn />
 					</IconButton>
 				</div >
 
 				<div id="zoom-out-icon" onClick={this.zoom_out_click}>
-					<IconButton tooltip={tooltip_zoom_out}
+					<IconButton tooltip={tooltipZoomOut}
 						iconStyle={styles.smallIcon}
 						style={styles.small}
 						tooltipPosition="top-center">
-						<ContentRemove />
+						<ZoomOut />
 					</IconButton>
 				</div >
 			</div>
