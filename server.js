@@ -6,6 +6,9 @@ const bodyParser = require('body-parser');
 const app = express();
 const cors = require('cors');
 var multer  = require('multer');
+var unzipper = require('unzipper');
+const uuidv4 = require('uuid/v4');
+var fs = require('fs');
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, __dirname + '/upload')
@@ -30,10 +33,46 @@ app.get('*', (req, res, next) => {
   res.sendFile(path.join(__dirname, 'build/index.html'));
 });
 
-//get upload file
-app.post('/upload',upload.any(), (req, res, next) => {
-  res.send({status: 'Sucessfully uploaded'})
+//====================================================================
+
+//get uploaded file
+app.post('/upload', upload.any(), (req, res, next) => {
+  try {
+    //create uuid folder
+    var uuid_v4 = uuidv4();
+    var dir = path.join(__dirname, `upload/${uuid_v4}`);
+    if (!fs.existsSync(dir)){
+      fs.mkdirSync(dir);
+    }
+
+    //unzip file
+    var zip_file_path = req.files[0].path;
+    var basename = path.basename(zip_file_path);
+    var file_extension = path.extname(basename);
+    if(file_extension == '.zip'){
+      fs.createReadStream(zip_file_path).pipe(unzipper.Extract({ path: dir }));
+      //delete origin file
+      fs.unlinkSync(zip_file_path);
+      //send status of uploaded process
+      res.send({status: 'Sucessfully uploaded', uuid: uuid_v4});
+    }else{
+      fs.unlinkSync(zip_file_path);
+      res.send({status: 'Fail uploaded'});
+    }
+  }
+  catch(error) {
+    res.send({status: 'Fail uploaded'});
+  }
 });
+
+//get singal for processing
+app.post('/process', (req, res, next) => {
+  console.log(req.body)
+});
+//====================================================================
+
+
+
 /**
  * Get port from environment and store in Express.
  */

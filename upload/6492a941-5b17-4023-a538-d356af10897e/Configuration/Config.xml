@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LUPA>
+    <AdministrativeBoundary name="AdministrativeBoundary" type="shp"></AdministrativeBoundary>
+    <PotentialLocations name="PotentialLocations" type="shp"></PotentialLocations>
+    <PixelSize size="10" unit="m"></PixelSize>
+    <DataCoor crs="WGS84/UTMzone48N" id="EPSG:32648"></DataCoor>
+    <GroupWeights>
+        <Group name="EconomicGroup" value="0.163"></Group>
+        <Group name="SocialGroup" value="0.251"></Group>
+        <Group name="EnvironmentGroup" value="0.585"></Group>
+    </GroupWeights>
+    
+    <Criteria>
+        <SpatialCriteria>
+            <Criterion>
+                <Data name="ElectricSupplyStations" type="shp"></Data>
+                <Group name="EconomicGroup"></Group>
+                <Weight value="0.073"></Weight>
+                <FuzzyType id="2"></FuzzyType>
+                <FuzzyA value="1000"></FuzzyA>
+                <FuzzyB value="3000"></FuzzyB>
+                <FuzzyC value="0"></FuzzyC>
+                <FuzzyD value="0"></FuzzyD>
+            </Criterion>
+            <Criterion>
+                <Data name="roads" type="shp"></Data>
+                <Group name="EconomicGroup"></Group>
+                <Weight value="0.183"></Weight>
+                <FuzzyType id="3"></FuzzyType>
+                <FuzzyA value="0"></FuzzyA>
+                <FuzzyB value="200"></FuzzyB>
+                <FuzzyC value="500"></FuzzyC>
+                <FuzzyD value="1000"></FuzzyD>
+            </Criterion>
+            <Criterion>
+                <Data name="LandUseStatus" type="shp"></Data>
+                <Group name="EconomicGroup"></Group>
+                <Weight value="0.416"></Weight>
+                <FuzzyType id="5"></FuzzyType>
+                <FuzzyA value="1"></FuzzyA>
+                <FuzzyB value="0.8"></FuzzyB>
+                <FuzzyC value="0.4"></FuzzyC>
+                <FuzzyD value="0"></FuzzyD>
+            </Criterion>
+            <Criterion>
+                <Data name="slope" type="tif"></Data>
+                <Group name="EconomicGroup"></Group>
+                <Weight value="0.328"></Weight>
+                <FuzzyType id="2"></FuzzyType>
+                <FuzzyA value="3"></FuzzyA>
+                <FuzzyB value="15"></FuzzyB>
+                <FuzzyC value="0"></FuzzyC>
+                <FuzzyD value="0"></FuzzyD>
+            </Criterion>
+            <Criterion>
+                <Data name="UrbanResidentialAreas" type="shp"></Data>
+                <Group name="EnvironmentGroup"></Group>
+                <Weight value="0.465"></Weight>
+                <FuzzyType id="1"></FuzzyType>
+                <FuzzyA value="0"></FuzzyA>
+                <FuzzyB value="5000"></FuzzyB>
+                <FuzzyC value="0"></FuzzyC>
+                <FuzzyD value="0"></FuzzyD>
+            </Criterion>
+            <Criterion>
+                <Data name="RuralResidentialAreas" type="shp"></Data>
+                <Group name="EnvironmentGroup"></Group>
+                <Weight value="0.235"></Weight>
+                <FuzzyType id="1"></FuzzyType>
+                <FuzzyA value="0"></FuzzyA>
+                <FuzzyB value="3000"></FuzzyB>
+                <FuzzyC value="0"></FuzzyC>
+                <FuzzyD value="0"></FuzzyD>
+            </Criterion>
+            <Criterion>
+                <Data name="SurfaceWaterSources" type="shp"></Data>
+                <Group name="EnvironmentGroup"></Group>
+                <Weight value="0.099"></Weight>
+                <FuzzyType id="1"></FuzzyType>
+                <FuzzyA value="0"></FuzzyA>
+                <FuzzyB value="1000"></FuzzyB>
+                <FuzzyC value="0"></FuzzyC>
+                <FuzzyD value="0"></FuzzyD>
+            </Criterion>
+            <Criterion>
+                <Data name="HistoricMonumentAreas" type="shp"></Data>
+                <Group name="EnvironmentGroup"></Group>
+                <Weight value="0.205"></Weight>
+                <FuzzyType id="1"></FuzzyType>
+                <FuzzyA value="0"></FuzzyA>
+                <FuzzyB value="3000"></FuzzyB>
+                <FuzzyC value="0"></FuzzyC>
+                <FuzzyD value="0"></FuzzyD>
+            </Criterion>
+        </SpatialCriteria>
+        
+        <NonSpatialCriteria>
+            <Criterion>
+                <Data name="SurroundingHouseholds" type="survey"></Data>
+                <Group name="SocialGroup"></Group>
+                <Weight value="0.5"></Weight>
+                <locations>
+                    <location name="location1" wscore="0.7"></location>
+                    <location name="location2" wscore="0.8"></location>
+                </locations>
+            </Criterion>
+            <Criterion>
+                <Data name="LocalAuthorities" type="survey"></Data>
+                <Group name="SocialGroup"></Group>
+                <Weight value="0.5"></Weight>
+                <locations>
+                    <location name="location1" wscore="0.9"></location>
+                    <location name="location2" wscore="0.85"></location>
+                </locations>
+            </Criterion>
+        </NonSpatialCriteria>
+    </Criteria>
+</LUPA>

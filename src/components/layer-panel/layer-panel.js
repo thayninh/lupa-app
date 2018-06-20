@@ -24,7 +24,7 @@ class LayerPanel extends React.Component {
 		return (
 			<div id="layer-list">
 				<div id="layer-list-c1">
-					Layers here
+					No layers
 				</div>
 			</div>
 		);
