@@ -54,7 +54,7 @@ def getExtentQgis(in_layer):
 
 def rasterizeVector(workspace, spatial_criteria, administrative_boundary, pixel_size):
     try:
-        print("Initializing....\n")
+        # print("Initializing....\n")
         rasterization_result = []
         in_layer = '{}\\SpatialData\\{}.{}'.format(current_path, administrative_boundary.xpath('./@name')[0], administrative_boundary.xpath('./@type')[0])
         extent = getExtentQgis(in_layer)
@@ -64,7 +64,7 @@ def rasterizeVector(workspace, spatial_criteria, administrative_boundary, pixel_
             fuzzy_type = criterion.xpath('./FuzzyType/@id')[0]
             input_ = '{}\\SpatialData\\{}.{}'.format(current_path, name, type_)
             if(type_ == 'shp' and fuzzy_type != '5'):
-                print('Rasterizing layers: {}'.format(name))
+                # print('Rasterizing layers: {}'.format(name))
                 output = '{}\\{}.tif'.format(workspace, name)
                 params = {
                     'INPUT':input_,
@@ -81,9 +81,9 @@ def rasterizeVector(workspace, spatial_criteria, administrative_boundary, pixel_
                     'INVERT':False,
                     'OUTPUT':output}
                 rasterization_result.append(processing.run("gdal:rasterize", params))
-                print('output layers: {}\n'.format(output)) 
+                # print('output layers: {}\n'.format(output)) 
             elif(type_ == 'tif'):
-                print('Rasterizing layers: {}'.format(name))
+                # print('Rasterizing layers: {}'.format(name))
                 layer = QgsRasterLayer(input_, 'raster file')
                 output = '{}\\{}.sdat'.format(workspace, name)
                 params = {
@@ -98,9 +98,9 @@ def rasterizeVector(workspace, spatial_criteria, administrative_boundary, pixel_
                     'OUTPUT':output
                     }
                 rasterization_result.append(processing.run("saga:resampling", params))
-                print('output layers: {}\n'.format(output))
+                # print('output layers: {}\n'.format(output))
             elif(type_ == 'shp' and fuzzy_type == '5'):
-                print('Rasterizing layers: {}'.format(name))
+                # print('Rasterizing layers: {}'.format(name))
                 output = '{}\\LUS.tif'.format(workspace)
                 numeric_field = 'lut'
                 params = {
@@ -118,16 +118,16 @@ def rasterizeVector(workspace, spatial_criteria, administrative_boundary, pixel_
                     'INVERT':False,
                     'OUTPUT':output}
                 rasterization_result.append(processing.run("gdal:rasterize", params))
-                print('output layers: {}\n'.format(output))
+                # print('output layers: {}\n'.format(output))
             else:
                 raise TypeError("Input vector layer had wrong type")
         return rasterization_result
     except Exception as e:
-        print(e)
+        print("line 126: "+e)
 
 def calculateEuclideanDistance(rasterization_result, workspace):
     try:
-        print("Calculating euclidean distance....\n")
+        # print("Calculating euclidean distance....\n")
         euclidean_results = []
         for dict_ in rasterization_result:
             input_ = dict_['OUTPUT']
@@ -135,10 +135,10 @@ def calculateEuclideanDistance(rasterization_result, workspace):
             name = basename.split('.')[0]
             extension = basename.split('.')[1]
             if(name == 'LUS'):
-                print("keeping layer of {}\n".format(basename))
+                # print("keeping layer of {}\n".format(basename))
                 euclidean_results.append(input_)
             elif(extension == 'sdat'):
-                print("Converting layer of {}".format(basename))
+                # print("Converting layer of {}".format(basename))
                 output = "{}\\{}.tif".format(workspace,name)
                 params = {
                     'INPUT':input_,
@@ -150,9 +150,9 @@ def calculateEuclideanDistance(rasterization_result, workspace):
                     'OUTPUT':output
                     }
                 euclidean_results.append(processing.run("gdal:translate", params)['OUTPUT'])
-                print('output layers: {}\n'.format(output))
+                # print('output layers: {}\n'.format(output))
             else:
-                print("Calculating layer: {}".format(basename))
+                # print("Calculating layer: {}".format(basename))
                 output = "{}\\disRas_{}".format(workspace, basename)
                 params = {
                     'INPUT':input_,
@@ -167,14 +167,14 @@ def calculateEuclideanDistance(rasterization_result, workspace):
                     'OUTPUT':output
                     }
                 euclidean_results.append(processing.run("gdal:proximity", params)['OUTPUT'])
-                print('output layers: {}\n'.format(output))
+                # print('output layers: {}\n'.format(output))
         return euclidean_results
     except Exception as e:
-        print(e)
+        print("line 173: "+e)
     
 def calculateFuzzyRaster(spatial_criteria, euclidean_results, workspace):
     try:
-        print('Calculating fuzzy raster....\n')
+        # print('Calculating fuzzy raster....\n')
         fuzzy_raster_result = []
         for criterion in spatial_criteria:
             data_name = criterion.xpath('./Data/@name')[0]
@@ -189,7 +189,7 @@ def calculateFuzzyRaster(spatial_criteria, euclidean_results, workspace):
                 name = basename.split('.')[0].replace('disRas_','')
                 result = '{}\\fuzRas_{}.sdat'.format(workspace,name)
                 if(fuzzy_type == '5' and name == 'LUS'):
-                    print("Calculating layer: {}".format(basename))
+                    # print("Calculating layer: {}".format(basename))
                     formula = "ifelse(eq(a,1),{},ifelse(eq(a,2),{},ifelse(eq(a,3),{},{})))".format(fuzzy_a,fuzzy_b,fuzzy_c,fuzzy_d)
                     params = {
                         'GRIDS':layer,
@@ -201,9 +201,9 @@ def calculateFuzzyRaster(spatial_criteria, euclidean_results, workspace):
                         'RESULT':result
                         }
                     fuzzy_raster_result.append(processing.run("saga:rastercalculator", params)['RESULT'])
-                    print("output layer: {}\n".format(result))
+                    # print("output layer: {}\n".format(result))
                 elif(name == data_name):
-                    print("Calculating layer: {}".format(basename))
+                    # print("Calculating layer: {}".format(basename))
                     formula = ""
                     if(fuzzy_type == '1'):
                         formula =  "ifelse(lt(a,{}),0,ifelse(eq(a,{}),0,ifelse(lt(a,{}),(a-{})/({}-{}),1)))".format(fuzzy_a, fuzzy_a,fuzzy_b,fuzzy_a,fuzzy_b,fuzzy_a)
@@ -225,10 +225,10 @@ def calculateFuzzyRaster(spatial_criteria, euclidean_results, workspace):
                         'RESULT':result
                         }
                     fuzzy_raster_result.append(processing.run("saga:rastercalculator", params)['RESULT'])
-                    print("output layer: {}\n".format(result))
+                    # print("output layer: {}\n".format(result))
         return fuzzy_raster_result
     except Exception as e:
-        print(e)
+        print("line 231: "+e)
 
 def convertSDATToTiff(fuzzy_raster_result, workspace):
     try:
@@ -249,11 +249,11 @@ def convertSDATToTiff(fuzzy_raster_result, workspace):
             fuzzy_raster_result_converted.append(processing.run("gdal:translate", params)['OUTPUT'])
         return fuzzy_raster_result_converted
     except Exception as e:
-        print(e)
+        print("line 252: "+e)
 
 def calculateReasonalRaster(fuzzy_raster_result_converted, spatial_criteria, dict_group_weights, workspace):
     try:
-        print('Calculating reasonable raster....')
+        # print('Calculating reasonable raster....')
         dict_criterion_weights = {}
         result = '{}\\reasonableRaster.sdat'.format(workspace)
         for criterion in spatial_criteria:
@@ -290,14 +290,15 @@ def calculateReasonalRaster(fuzzy_raster_result_converted, spatial_criteria, dic
             'TYPE':7,
             'RESULT':result
             }
-        print('output layer: {}\n'.format(result))
-        return processing.run("saga:rastercalculator", params)['RESULT']   
+        # print('output layer: {}\n'.format(result))
+        return processing.run("saga:rastercalculator", params)['RESULT']
+        # return("hehe")   
     except Exception as e:
-        print(e)
+        print("line 296: "+e)
 
 def calculateZonalStatistic(reasonable_raster, potential_locations):
     try:
-        print('Calculating zonal statistic....')
+        # print('Calculating zonal statistic....')
         input_vector = '{}\\SpatialData\\{}.{}'.format(current_path, potential_locations.xpath('./@name')[0], potential_locations.xpath('./@type')[0])
         params = {
             'INPUT_RASTER':reasonable_raster,
@@ -306,14 +307,14 @@ def calculateZonalStatistic(reasonable_raster, potential_locations):
             'COLUMN_PREFIX':'_',
             'STATS':[2]}
         spatial_reasonable_result = processing.run("qgis:zonalstatistics", params)['INPUT_VECTOR']
-        print('output layer: {}\n'.format(spatial_reasonable_result))
+        # print('output layer: {}\n'.format(spatial_reasonable_result))
         return spatial_reasonable_result
     except Exception as e:
-        print(e)
+        print("line 312: "+e)
 
 def getNonspatialWeight(dict_group_weights, nonspatial_criteria):
     try:
-        print('Calculating non spatial weight....\n')
+        # print('Calculating non spatial weight....\n')
         nonspatial_weight = {}
         for criterion in nonspatial_criteria:
             data_name = criterion.xpath('./Data/@name')[0]
@@ -331,11 +332,11 @@ def getNonspatialWeight(dict_group_weights, nonspatial_criteria):
                     nonspatial_weight[location_name] = weight
         return nonspatial_weight #{'location2': xxx, 'location1': xxx}
     except Exception as e:
-        print(e)
+        print("line 334: " + e)
 
 def calculateFinalScore(potential_locations, nonspatial_weight):
     try:
-        print('Calculating final score....\n')
+        # print('Calculating final score....\n')
         final_reasonable_score = {}
         input_vector = '{}\\SpatialData\\{}.{}'.format(current_path, potential_locations.xpath('./@name')[0], potential_locations.xpath('./@type')[0])
         layer = QgsVectorLayer(input_vector, 'potential layer', 'ogr')
@@ -347,7 +348,7 @@ def calculateFinalScore(potential_locations, nonspatial_weight):
             final_reasonable_score[object_name] = {'spatialCriteria':spatial_weight, 'nonspatialCriteria':non_spatial_weight, 'finalScore':final_score}
         return final_reasonable_score
     except Exception as e:
-        print(e)
+        print("line 350: " + e)
 
 def calculateDistanceZonal(potential_locations, euclidean_results):
     try:
@@ -362,7 +363,7 @@ def calculateDistanceZonal(potential_locations, euclidean_results):
                 'STATS':[2]}
             processing.run("qgis:zonalstatistics", params)
     except Exception as e:
-        print(e)
+        print("line 365" + e)
 
 def dictDistanceZonal(potential_locations, euclidean_results):
     try:
@@ -378,7 +379,7 @@ def dictDistanceZonal(potential_locations, euclidean_results):
                 dict_dist_zonal[object_name].update({full_name: feature[short_name]})
         return dict_dist_zonal                    
     except Exception as e:
-        print(e)
+        print("line 381: " + e)
 
 # ======END FUNCTIONS=====================================================================================================================================
 # ========================================================================================================================================================
@@ -446,7 +447,7 @@ def run():
         dict_dist_zonal = dictDistanceZonal(potential_locations, euclidean_results) #Example: dict_dist_zonal = {'location1': {'ElectricSupplyStations': 5640.478687156936, 'roads': 576.6086852174557, 'LUS': 2.0, 'slope': 0.100790761707478, 'UrbanResidentialAreas': 7336.947342619449, 'RuralResidentialAreas': 646.1213782152491, 'SurfaceWaterSources': 591.6102332688139, 'HistoricMonumentAreas': 657.5448945858284}, 'location2': {'ElectricSupplyStations': 1817.6805622059812, 'roads': 111.71509711973128, 'LUS': 2.002150537634408, 'slope': 0.326851466547059, 'UrbanResidentialAreas': 4962.380340116768, 'RuralResidentialAreas': 675.9655537266885, 'SurfaceWaterSources': 298.90933261994394, 'HistoricMonumentAreas': 899.7038061654696}}
         
         #Step-10: Produce report in HTML format
-        print('Creating report....')
+        # print('Creating report....')
         html_string = """ 
         <!DOCTYPE html>
         <html>
@@ -528,10 +529,10 @@ def run():
         with open(html_file,'w+') as f:
             f.write(html_string)
         
-        print('ouput report file: {}\n'.format(html_file))
+        # print('ouput report file: {}\n'.format(html_file))
         print('Successful Running')
     except Exception as e:
-        print(e)
+        print("line 534: " + e)
 
 #Run algorithm
 run()
