@@ -32,10 +32,18 @@ app.use(express.static(path.join(__dirname, 'build')));
 
 
 // Catch all other routes and return the index file
-app.get('*', (req, res, next) => {
+app.get('/', (req, res, next) => {
   res.sendFile(path.join(__dirname, 'build/index.html'));
 });
 
+app.get('/report', (req, res, next) => {
+  try {
+    var uuid = req.query.ID;
+    res.sendFile(path.join(__dirname, `upload/${uuid}/workspace/report.html`));
+  } catch (error) {
+    console.log(error);
+  }
+});
 //====================================================================
 
 //get uploaded file
@@ -88,7 +96,7 @@ app.post('/process', (req, res, next) => {
               res.status(500).send({ status: 'Fail processed' });
             } else {
               res.status(200).send({ status: 'Sucessfully processed' });
-              console.log(data)
+              // console.log(data)
             }
           }
         );

@@ -3,10 +3,12 @@ import AppBar from 'material-ui/AppBar';
 import RaisedButton from 'material-ui/RaisedButton';
 import CloudUpload from 'material-ui/svg-icons/file/cloud-upload'
 import Explore from 'material-ui/svg-icons/action/explore'
+import DataUsage from 'material-ui/svg-icons/device/data-usage'
 import axios from 'axios';
 import qs from 'qs';
 import Dialog from 'material-ui/Dialog';
 import CircularProgress from 'material-ui/CircularProgress';
+import FlatButton from 'material-ui/FlatButton';
 require('whatwg-fetch');
 // import { FormattedMessage } from 'react-intl';
 const customContentStyle = {
@@ -16,9 +18,12 @@ const customContentStyle = {
 class HeaderPanel extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { selectedFile: null, uuid: null, open: false };
+		this.state = { selectedFile: null, uuid: null, open: false, result: false, html_string: null };
 		this.upload_data_click = this.upload_data_click.bind(this);
 		this.process_click = this.process_click.bind(this);
+		this.result_click = this.result_click.bind(this);
+		this.handleClose = this.handleClose.bind(this);
+		this.handleDownload = this.handleDownload.bind(this);
 	}
 
 	upload_data_click = event => {
@@ -26,7 +31,7 @@ class HeaderPanel extends React.Component {
 		this.setState({ selectedFile: event.target.files[0] }, () => {
 			const fd = new FormData();
 			fd.append('userFile', this.state.selectedFile, this.state.selectedFile.name);
-			axios.post('http://localhost:4000/upload', fd).then(res => {
+			axios.post('http://127.0.0.1:4000/upload', fd).then(res => {
 				if (res.data.status === 'Sucessfully uploaded') {
 					this.setState({ open: false });
 					this.setState({ uuid: res.data.uuid }, () => {
@@ -43,63 +48,45 @@ class HeaderPanel extends React.Component {
 
 	process_click = () => {
 		this.setState({ open: true });
-		
-		const payload = JSON.stringify({ uuid: this.state.uuid })
-		const options = {
-			method: 'POST',
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json',
-			},
-			body: payload,
-			cors: true, // allow cross-origin HTTP request
-			credentials: 'include' // This is similar to XHR’s withCredentials flag
-		};
-
-		fetch('http://localhost:4000/process', options)
-			.then((response) => {
-				return response.json();
-			})
-			.then((myJson) => {
-				if(myJson.status === 'Sucessfully processed'){
-					this.setState({open: false}, () => {
-						alert("Sucessfully processed");
-					});
-				}else if(myJson.status === 'Fail processed'){
-					this.setState({open: false}, () => {
-						alert("Fail processed");
-					});
-				}else{
-					this.setState({open: false}, () => {
-						alert("Fail processed");
-					});
-				}
-			})
-			.catch((error) => {
-				console.log(error)
-			});
-
-		// 	axios({
-		// 		method:'post',
-		// 		url:'http://localhost:4000/process',
-		// 		data: qs.stringify({uuid: this.state.uuid})
-		// 	  }).then(res => {
-				// if(res.data.status === 'Sucessfully processed'){
-				// 	this.setState({open: false}, () => {
-				// 		alert("Sucessfully processed");
-				// 	});
-				// }else if(res.data.status === 'Fail processed'){
-				// 	this.setState({open: false}, () => {
-				// 		alert("Fail processed");
-				// 	});
-				// }else{
-				// 	this.setState({open: false}, () => {
-				// 		alert("Fail processed");
-				// 	});
-		// 		}
-		// 	}).catch(error => console.log(error));;
+		axios({
+			method: 'post',
+			url: 'http://127.0.0.1:4000/process',
+			data: qs.stringify({ uuid: this.state.uuid })
+		}).then(res => {
+			if (res.data.status === 'Sucessfully processed') {
+				this.setState({ open: false }, () => {
+					alert("Sucessfully processed");
+				});
+			} else if (res.data.status === 'Fail processed') {
+				this.setState({ open: false }, () => {
+					alert("Fail processed");
+				});
+			} else {
+				this.setState({ open: false }, () => {
+					alert("Fail processed");
+				});
+			}
+		}).catch(error => console.log(error));
 	}
 
+	result_click = () => {
+		this.setState({ result: true });
+		axios({
+			method: 'get',
+			url: 'http://127.0.0.1:4000/report',
+			params: { ID: this.state.uuid }
+		}).then(res => {
+			this.setState({ html_string: res.data });
+		}).catch(error => console.log(error));
+	}
+
+	handleClose = () =>{
+		this.setState({result: false});
+	}
+
+	handleDownload = () =>{
+		//
+	}
 	render() {
 		const styles = {
 			appHeight: {
@@ -119,8 +106,25 @@ class HeaderPanel extends React.Component {
 
 				<RaisedButton label="Process" icon={<Explore />} secondary={true} style={{ marginLeft: 12 }} onClick={this.process_click}>
 				</RaisedButton>
+
+				<RaisedButton label="Result" icon={<DataUsage />} secondary={true} style={{ marginLeft: 12 }} onClick={this.result_click}>
+				</RaisedButton>
 			</div>
 		);
+		
+		const actions = [
+			<FlatButton
+			  label="Close"
+			  primary={true}
+			  onClick={this.handleClose}
+			/>,
+
+			<FlatButton
+			  label="Download"
+			  primary={true}
+			  onClick={this.handleDownload}
+			/>,
+		  ];
 		return (
 			<div>
 				<AppBar title="Spatial Decision Support System For Land Use Planning Assessment"
@@ -132,11 +136,17 @@ class HeaderPanel extends React.Component {
 				<Dialog
 					modal={true}
 					open={this.state.open}
-					contentStyle={customContentStyle}
-				>
+					contentStyle={customContentStyle}>
 					<CircularProgress size={80} thickness={5} />
 					Processing.........
         		</Dialog>
+
+				<Dialog
+					actions={actions}
+					modal={true}
+					open={this.state.result}>
+					<div dangerouslySetInnerHTML={{ __html: this.state.html_string }} />
+				</Dialog>
 			</div >
 		);
 	}
