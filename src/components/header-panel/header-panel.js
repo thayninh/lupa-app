@@ -9,10 +9,15 @@ import qs from 'qs';
 import Dialog from 'material-ui/Dialog';
 import CircularProgress from 'material-ui/CircularProgress';
 import FlatButton from 'material-ui/FlatButton';
+import fileDownload from 'js-file-download';
 require('whatwg-fetch');
 // import { FormattedMessage } from 'react-intl';
 const customContentStyle = {
 	width: '30%',
+	maxWidth: 'none',
+};
+const customResultStyle = {
+	width: '90%',
 	maxWidth: 'none',
 };
 class HeaderPanel extends React.Component {
@@ -85,7 +90,13 @@ class HeaderPanel extends React.Component {
 	}
 
 	handleDownload = () =>{
-		//
+		axios({
+			method: 'get',
+			url: 'http://127.0.0.1:4000/report',
+			params: { ID: this.state.uuid }
+		}).then(res => {
+			fileDownload(res.data, 'report.html');
+		}).catch(error => console.log(error));
 	}
 	render() {
 		const styles = {
@@ -144,7 +155,8 @@ class HeaderPanel extends React.Component {
 				<Dialog
 					actions={actions}
 					modal={true}
-					open={this.state.result}>
+					open={this.state.result}
+					contentStyle={customResultStyle}>
 					<div dangerouslySetInnerHTML={{ __html: this.state.html_string }} />
 				</Dialog>
 			</div >
