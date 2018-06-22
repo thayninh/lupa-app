@@ -62,10 +62,40 @@ app.post('/upload', upload.any(), (req, res, next) => {
     var file_extension = path.extname(basename);
     if (file_extension == '.zip') {
       fs.createReadStream(zip_file_path).pipe(unzipper.Extract({ path: dir }));
-      //delete origin file
-      fs.unlinkSync(zip_file_path);
-      //send status of uploaded process
-      res.send({ status: 'Sucessfully uploaded', uuid: uuid_v4 });
+      
+      //Copy lupa and lupa1 to uuid folder
+      var source_file_lupa = path.join(__dirname, 'lupa.py');
+      var source_file_lupa1 = path.join(__dirname, 'lupa1.py');
+      var dest_file_lupa = path.join(__dirname, `upload/${uuid_v4}/lupa.py`);
+      var dest_file_lupa1 = path.join(__dirname, `upload/${uuid_v4}/lupa1.py`);
+      fsExtra.copy(source_file_lupa, dest_file_lupa, err => {
+        if (err) {
+          res.send({ status: 'Fail uploaded' });
+        } else {
+          fsExtra.copy(source_file_lupa1, dest_file_lupa1, err => {
+            if (err) {
+              res.send({ status: 'Fail uploaded' });
+            } else {
+              //delete origin file
+              fs.unlinkSync(zip_file_path);
+              
+              //run cmd command "C:\\Program Files\\QGIS 3.0\\bin\\python-qgis.bat" ${dest_file}
+              var command = `"C:\\Program Files\\QGIS 3.0\\bin\\python-qgis.bat" ${dest_file_lupa}`;
+              cmd.get(
+                command,
+                function (err, data, stderr) {
+                  if (err) {
+                    res.status(500).send({ status: 'Fail uploaded' });
+                  } else {
+                    console.log(data)
+                    res.status(200).send({ status: 'Sucessfully uploaded', uuid: uuid_v4 });
+                  }
+                }
+              );
+            }
+          });
+        }
+      });
     } else {
       fs.unlinkSync(zip_file_path);
       res.send({ status: 'Fail uploaded' });
@@ -80,28 +110,23 @@ app.post('/upload', upload.any(), (req, res, next) => {
 app.post('/process', (req, res, next) => {
   try {
     var received_uuid = req.body.uuid;
-    var source_file = path.join(__dirname, 'lupa.py');
-    var dest_file = path.join(__dirname, `upload/${received_uuid}/lupa.py`);
-    //copy lupa.py to uuid folder
-    fsExtra.copy(source_file, dest_file, err => {
-      if (err) {
-        res.send({ status: 'Fail processed' });
-      } else {
-        //run cmd command "C:\\Program Files\\QGIS 3.0\\bin\\python-qgis.bat" ${dest_file}
-        var command = `"C:\\Program Files\\QGIS 3.0\\bin\\python-qgis.bat" ${dest_file}`;
-        cmd.get(
-          command,
-          function (err, data, stderr) {
-            if (err) {
-              res.status(500).send({ status: 'Fail processed' });
-            } else {
-              res.status(200).send({ status: 'Sucessfully processed' });
-              // console.log(data)
-            }
-          }
-        );
+    var dest_file = path.join(__dirname, `upload/${received_uuid}/lupa1.py`);
+
+    //run cmd command "C:\\Program Files\\QGIS 3.0\\bin\\python-qgis.bat" ${dest_file}
+    var command = `"C:\\Program Files\\QGIS 3.0\\bin\\python-qgis.bat" ${dest_file}`;
+    cmd.get(
+      command,
+      function (err, data, stderr) {
+        if (err) {
+          console.log(err);
+          res.status(500).send({ status: 'Fail processed' });
+        } else {
+          console.log(data)
+          res.status(200).send({ status: 'Sucessfully processed' });
+        }
       }
-    });
+    );
+
   } catch (error) {
     res.send({ status: 'Fail processed' });
   }
