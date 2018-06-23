@@ -23,7 +23,7 @@ const customResultStyle = {
 class HeaderPanel extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { selectedFile: null, uuid: null, open: false, result: false, html_string: null };
+		this.state = { selectedFile: null, uuid: null, open: false, result: false, html_string: null, progress: 0, upload: false };
 		this.upload_data_click = this.upload_data_click.bind(this);
 		this.process_click = this.process_click.bind(this);
 		this.result_click = this.result_click.bind(this);
@@ -32,18 +32,18 @@ class HeaderPanel extends React.Component {
 	}
 
 	upload_data_click = event => {
-		this.setState({ open: true });
+		this.setState({ upload: true });
 		this.setState({ selectedFile: event.target.files[0] }, () => {
 			const fd = new FormData();
 			fd.append('userFile', this.state.selectedFile, this.state.selectedFile.name);
 			axios.post('http://127.0.0.1:4000/upload', fd).then(res => {
 				if (res.data.status === 'Sucessfully uploaded') {
-					this.setState({ open: false });
+					this.setState({ upload: false });
 					this.setState({ uuid: res.data.uuid }, () => {
 						alert("Successfully uploaded");
 					})
 				} else if (res.data.status === 'Fail uploaded') {
-					this.setState({ open: false }, () => {
+					this.setState({ upload: false }, () => {
 						alert("Fail uploaded");
 					});
 				}
@@ -55,13 +55,31 @@ class HeaderPanel extends React.Component {
 		this.setState({ open: true });
 		axios({
 			method: 'post',
-			url: 'http://127.0.0.1:4000/process',
+			url: 'http://127.0.0.1:4000/process-lupa',
 			data: qs.stringify({ uuid: this.state.uuid })
 		}).then(res => {
 			if (res.data.status === 'Sucessfully processed') {
-				this.setState({ open: false }, () => {
-					alert("Sucessfully processed");
-				});
+				console.log("OK stage 1");
+				axios({
+					method: 'post',
+					url: 'http://127.0.0.1:4000/process-lupa1',
+					data: qs.stringify({ uuid: this.state.uuid })
+				}).then(res => {
+					if (res.data.status === 'Sucessfully processed') {
+						console.log("OK stage 2");
+						this.setState({ open: false }, () => {
+							alert("Sucessfully processed");
+						});
+					} else if (res.data.status === 'Fail processed') {
+						this.setState({ open: false }, () => {
+							alert("Fail processed");
+						});
+					} else {
+						this.setState({ open: false }, () => {
+							alert("Fail processed");
+						});
+					}
+				}).catch(error => console.log(error));
 			} else if (res.data.status === 'Fail processed') {
 				this.setState({ open: false }, () => {
 					alert("Fail processed");
@@ -72,6 +90,14 @@ class HeaderPanel extends React.Component {
 				});
 			}
 		}).catch(error => console.log(error));
+		
+		for (let i = 1; i < 100; i++) {
+			((i) => {
+				setTimeout(() => {
+					this.setState({ progress: i });
+				}, i*1500);
+			})(i);
+		}
 	}
 
 	result_click = () => {
@@ -149,7 +175,15 @@ class HeaderPanel extends React.Component {
 					open={this.state.open}
 					contentStyle={customContentStyle}>
 					<CircularProgress size={80} thickness={5} />
-					Processing.........
+					Processing.........{this.state.progress}%
+        		</Dialog>
+
+				<Dialog
+					modal={true}
+					open={this.state.upload}
+					contentStyle={customContentStyle}>
+					<CircularProgress size={80} thickness={5} />
+					Uploading.........
         		</Dialog>
 
 				<Dialog

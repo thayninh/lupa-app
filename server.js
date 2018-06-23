@@ -78,20 +78,7 @@ app.post('/upload', upload.any(), (req, res, next) => {
             } else {
               //delete origin file
               fs.unlinkSync(zip_file_path);
-              
-              //run cmd command "C:\\Program Files\\QGIS 3.0\\bin\\python-qgis.bat" ${dest_file}
-              var command = `"C:\\Program Files\\QGIS 3.0\\bin\\python-qgis.bat" ${dest_file_lupa}`;
-              cmd.get(
-                command,
-                function (err, data, stderr) {
-                  if (err) {
-                    res.status(500).send({ status: 'Fail uploaded' });
-                  } else {
-                    console.log(data)
-                    res.status(200).send({ status: 'Sucessfully uploaded', uuid: uuid_v4 });
-                  }
-                }
-              );
+              res.send({ status: 'Sucessfully uploaded',uuid: uuid_v4 });
             }
           });
         }
@@ -106,14 +93,39 @@ app.post('/upload', upload.any(), (req, res, next) => {
   }
 });
 
-//get singal for processing
-app.post('/process', (req, res, next) => {
+//get singal for processing luapa
+app.post('/process-lupa', (req, res, next) => {
   try {
     var received_uuid = req.body.uuid;
-    var dest_file = path.join(__dirname, `upload/${received_uuid}/lupa1.py`);
+    var dest_file_lupa = path.join(__dirname, `upload/${received_uuid}/lupa.py`);
 
     //run cmd command "C:\\Program Files\\QGIS 3.0\\bin\\python-qgis.bat" ${dest_file}
-    var command = `"C:\\Program Files\\QGIS 3.0\\bin\\python-qgis.bat" ${dest_file}`;
+    var command = `"C:\\Program Files\\QGIS 3.0\\bin\\python-qgis.bat" ${dest_file_lupa}`;
+    cmd.get(
+      command,
+      function (err, data, stderr) {
+        if (err) {
+          res.status(500).send({ status: 'Fail processed' });
+        } else {
+          console.log(data)
+          res.status(200).send({ status: 'Sucessfully processed'});
+        }
+      }
+    );
+
+  } catch (error) {
+    res.send({ status: 'Fail processed' });
+  }
+});
+
+//get singal for processing for lupa1
+app.post('/process-lupa1', (req, res, next) => {
+  try {
+    var received_uuid = req.body.uuid;
+    var dest_file_lupa1 = path.join(__dirname, `upload/${received_uuid}/lupa1.py`);
+
+    //run cmd command "C:\\Program Files\\QGIS 3.0\\bin\\python-qgis.bat" ${dest_file}
+    var command = `"C:\\Program Files\\QGIS 3.0\\bin\\python-qgis.bat" ${dest_file_lupa1}`;
     cmd.get(
       command,
       function (err, data, stderr) {
@@ -122,7 +134,7 @@ app.post('/process', (req, res, next) => {
           res.status(500).send({ status: 'Fail processed' });
         } else {
           console.log(data)
-          res.status(200).send({ status: 'Sucessfully processed' });
+          res.status(200).send({  status: 'Sucessfully processed'});
         }
       }
     );
