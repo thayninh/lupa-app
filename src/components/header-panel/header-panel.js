@@ -36,7 +36,7 @@ class HeaderPanel extends React.Component {
 		this.setState({ selectedFile: event.target.files[0] }, () => {
 			const fd = new FormData();
 			fd.append('userFile', this.state.selectedFile, this.state.selectedFile.name);
-			axios.post('http://127.0.0.1:4000/upload', fd).then(res => {
+			axios.post('http://172.16.1.162:4000/upload', fd).then(res => {
 				if (res.data.status === 'Sucessfully uploaded') {
 					this.setState({ upload: false });
 					this.setState({ uuid: res.data.uuid }, () => {
@@ -54,7 +54,7 @@ class HeaderPanel extends React.Component {
 			((i) => {
 				setTimeout(() => {
 					this.setState({ upload_progress: i });
-				}, i*250);
+				}, i*30);
 			})(i);
 		}
 	}
@@ -63,14 +63,14 @@ class HeaderPanel extends React.Component {
 		this.setState({ open: true });
 		axios({
 			method: 'post',
-			url: 'http://127.0.0.1:4000/process-lupa',
+			url: 'http://172.16.1.162:4000/process-lupa',
 			data: qs.stringify({ uuid: this.state.uuid })
 		}).then(res => {
 			if (res.data.status === 'Sucessfully processed') {
 				console.log("OK stage 1");
 				axios({
 					method: 'post',
-					url: 'http://127.0.0.1:4000/process-lupa1',
+					url: 'http://172.16.1.162:4000/process-lupa1',
 					data: qs.stringify({ uuid: this.state.uuid })
 				}).then(res => {
 					if (res.data.status === 'Sucessfully processed') {
@@ -112,7 +112,7 @@ class HeaderPanel extends React.Component {
 		this.setState({ result: true });
 		axios({
 			method: 'get',
-			url: 'http://127.0.0.1:4000/report',
+			url: 'http://172.16.1.162:4000/report',
 			params: { ID: this.state.uuid }
 		}).then(res => {
 			this.setState({ html_string: res.data });
@@ -126,7 +126,7 @@ class HeaderPanel extends React.Component {
 	handleDownload = () =>{
 		axios({
 			method: 'get',
-			url: 'http://127.0.0.1:4000/report',
+			url: 'http://172.16.1.162:4000/report',
 			params: { ID: this.state.uuid }
 		}).then(res => {
 			fileDownload(res.data, 'report.html');
