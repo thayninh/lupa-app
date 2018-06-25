@@ -23,7 +23,7 @@ const customResultStyle = {
 class HeaderPanel extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { selectedFile: null, uuid: null, open: false, result: false, html_string: null, progress: 0, upload: false };
+		this.state = { selectedFile: null, uuid: null, open: false, result: false, html_string: null, progress: 0, upload: false, upload_progress:0 };
 		this.upload_data_click = this.upload_data_click.bind(this);
 		this.process_click = this.process_click.bind(this);
 		this.result_click = this.result_click.bind(this);
@@ -48,7 +48,15 @@ class HeaderPanel extends React.Component {
 					});
 				}
 			}).catch(error => console.log(error));
-		})
+		});
+
+		for (let i = 1; i < 100; i++) {
+			((i) => {
+				setTimeout(() => {
+					this.setState({ upload_progress: i });
+				}, i*250);
+			})(i);
+		}
 	}
 
 	process_click = () => {
@@ -183,7 +191,7 @@ class HeaderPanel extends React.Component {
 					open={this.state.upload}
 					contentStyle={customContentStyle}>
 					<CircularProgress size={80} thickness={5} />
-					Uploading.........
+					Uploading.........{this.state.upload_progress}%
         		</Dialog>
 
 				<Dialog
