@@ -411,7 +411,7 @@ def run():
         data_coor = xml_tree.xpath('//LUPA/DataCoor/@id')[0]
 
         #Get weight of groups
-        dict_group_weights = {} #{'EnvironmentGroup': '0.585', 'EconomicGroup': '0.163', 'SocialGroup': '0.251'}
+        dict_group_weights = {} #For instance: {'EnvironmentGroup': '0.585', 'EconomicGroup': '0.163', 'SocialGroup': '0.251'}
         for group in group_weights:
             key = group.xpath('./@name')[0]
             value = group.xpath('./@value')[0]
@@ -422,6 +422,7 @@ def run():
 
         #Step-2: Get distance to the nearest object (Like Eucledian Distance tool in ArcGIS)
         euclidean_results = calculateEuclideanDistance(rasterization_result, workspace)
+    
         
         #Step-3: Calculate fuzzy raster of all layers
         fuzzy_raster_result = calculateFuzzyRaster(spatial_criteria, euclidean_results, workspace)
